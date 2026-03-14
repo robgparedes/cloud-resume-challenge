@@ -1,0 +1,43 @@
+import json
+import os
+import boto3
+from botocore.exceptions import ClientError
+
+dynamodb = boto3.resource("dynamodb")
+TABLE_NAME = os.environ.get("TABLE_NAME", "cloudresume-visitor-count")
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "https://robertgparedes.com",
+    "Access-Control-Allow-Headers": "content-type",
+    "Access-Control-Allow-Methods": "GET,OPTIONS",
+}
+
+def lambda_handler(event, context):
+    method = event.get("requestContext", {}).get("http", {}).get("method")
+
+    if method == "OPTIONS":
+        return {
+            "statusCode": 200,
+            "headers": CORS_HEADERS,
+            "body": ""
+        }
+
+    table = dynamodb.Table(TABLE_NAME)
+
+    try:
+        response = table.get_item(Key={"id": "visitors"})
+        item = response.get("Item", {})
+        count = int(item.get("count", 0))
+
+        return {
+            "statusCode": 200,
+            "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
+            "body": json.dumps({"count": count}),
+        }
+
+    except ClientError as e:
+        return {
+            "statusCode": 500,
+            "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
+            "body": json.dumps({"error": e.response["Error"]["Message"]}),
+        }
