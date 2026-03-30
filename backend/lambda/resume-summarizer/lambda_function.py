@@ -2,6 +2,7 @@ import json
 import boto3
 
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-2")
+MODEL_ID = "amazon.nova-lite-v1:0"
 
 def lambda_handler(event, context):
     method = event.get("requestContext", {}).get("http", {}).get("method")
@@ -18,7 +19,7 @@ def lambda_handler(event, context):
 
     try:
         body = json.loads(event.get("body", "{}"))
-        resume_text = body.get("text", "")
+        resume_text = (body.get("text", "") or "").strip()
 
         if not resume_text:
             return {
@@ -30,23 +31,33 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": "Missing text input"})
             }
 
-        prompt = f"Summarize this resume in 3 bullet points for a tech recruiter:\n{resume_text[:2000]}"
+        # Keep test inputs small
+        resume_text = resume_text[:1500]
 
-        response = bedrock.invoke_model(
-            modelId="anthropic.claude-3-haiku-20240307-v1:0",
-            contentType="application/json",
-            accept="application/json",
-            body=json.dumps({
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 200,
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ]
-            })
+        prompt = (
+            "Summarize this resume in 3 bullet points for a tech recruiter. "
+            "Focus on role, skills, and measurable impact if present.\n\n"
+            f"{resume_text}"
         )
 
-        result = json.loads(response["body"].read())
-        summary = result["content"][0]["text"]
+        response = bedrock.converse(
+            modelId=MODEL_ID,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"text": prompt}
+                    ]
+                }
+            ],
+            inferenceConfig={
+                "maxTokens": 150,
+                "temperature": 0.3,
+                "topP": 0.9
+            }
+        )
+
+        summary = response["output"]["message"]["content"][0]["text"].strip()
 
         return {
             "statusCode": 200,
