@@ -775,6 +775,7 @@
 
 </div>
 
+<!-- Visitor Counter Script -->
 <script>
   const API_BASE = "https://rkfk8cj2lh.execute-api.ap-southeast-2.amazonaws.com";
 
@@ -800,6 +801,45 @@
   }
 
   document.addEventListener("DOMContentLoaded", loadVisitorCount);
+</script>
+
+<!-- Summarizer Script -->
+<script>
+  const SUMMARIZE_API = "https://490058394460.execute-api.ap-southeast-2.amazonaws.com/summarize";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("summarize-btn");
+    const input = document.getElementById("summarizer-input");
+    const output = document.getElementById("summarizer-output");
+
+    if (!btn || !input || !output) return;
+
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      output.style.display = "block";
+      output.textContent = "Generating summary...";
+
+      try {
+        const res = await fetch(SUMMARIZE_API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: document.body.innerText
+          })
+        });
+
+        const data = await res.json();
+        output.textContent = data.summary || "No summary returned.";
+      } catch (err) {
+        console.error("Summarizer error:", err);
+        output.textContent = "Error generating summary.";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
 </script>
 
 </body>
