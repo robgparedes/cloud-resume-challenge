@@ -4,8 +4,6 @@ import boto3
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-2")
 
 def lambda_handler(event, context):
-
-    # Handle OPTIONS (CORS preflight)
     method = event.get("requestContext", {}).get("http", {}).get("method")
     if method == "OPTIONS":
         return {
@@ -22,7 +20,17 @@ def lambda_handler(event, context):
         body = json.loads(event.get("body", "{}"))
         resume_text = body.get("text", "")
 
-        prompt = f"Summarize this resume in 3 bullet points for a tech recruiter:\n{resume_text}"
+        if not resume_text:
+            return {
+                "statusCode": 400,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json"
+                },
+                "body": json.dumps({"error": "Missing text input"})
+            }
+
+        prompt = f"Summarize this resume in 3 bullet points for a tech recruiter:\n{resume_text[:2000]}"
 
         response = bedrock.invoke_model(
             modelId="anthropic.claude-3-haiku-20240307-v1:0",
@@ -50,10 +58,12 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
+        print("ERROR:", str(e))
         return {
             "statusCode": 500,
             "headers": {
-                "Access-Control-Allow-Origin": "*"
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
             },
             "body": json.dumps({"error": str(e)})
         }
