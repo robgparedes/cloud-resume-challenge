@@ -8,17 +8,3 @@ resource "aws_dynamodb_table" "visitor_count" {
     type = "S"
   }
 }
-
-resource "aws_dynamodb_table_item" "visitor_counter_seed" {
-  table_name = aws_dynamodb_table.visitor_count.name
-  hash_key   = "id"
-
-  item = jsonencode({
-    id = {
-      S = "visitors"
-    }
-    count = {
-      N = "0"
-    }
-  })
-}
