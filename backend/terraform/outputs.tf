@@ -1,15 +1,29 @@
 output "api_base_url" {
-  value = aws_apigatewayv2_api.visitor_api.api_endpoint
+  description = "Base URL of the deployed API"
+  value       = aws_apigatewayv2_stage.default.invoke_url
 }
 
 output "get_visitor_count_url" {
-  value = "${aws_apigatewayv2_api.visitor_api.api_endpoint}/visitorCount"
+  description = "Endpoint to retrieve the visitor count"
+  value       = "${aws_apigatewayv2_stage.default.invoke_url}/visitorCount"
 }
 
 output "increment_visitor_count_url" {
-  value = "${aws_apigatewayv2_api.visitor_api.api_endpoint}/visitorCount/increment"
+  description = "Endpoint to increment the visitor count"
+  value       = "${aws_apigatewayv2_stage.default.invoke_url}/visitorCount/increment"
 }
 
 output "dynamodb_table_name" {
-  value = aws_dynamodb_table.visitor_count.name
+  description = "Name of the DynamoDB table storing the visitor count"
+  value       = aws_dynamodb_table.visitor_count.name
+}
+
+output "cloudfront_domain" {
+  description = "CloudFront distribution domain name"
+  value       = aws_cloudfront_distribution.frontend.domain_name
+}
+
+output "frontend_url" {
+  description = "Public URL of the resume site"
+  value       = "https://${aws_cloudfront_distribution.frontend.domain_name}"
 }

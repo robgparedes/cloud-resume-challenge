@@ -1,5 +1,5 @@
 resource "aws_apigatewayv2_api" "visitor_api" {
-  name          = "${var.project_name}-visitor-api"
+  name          = local.api_name
   protocol_type = "HTTP"
 
   cors_configuration {

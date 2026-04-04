@@ -55,15 +55,13 @@ resource "aws_lambda_function" "increment_visitor_count" {
 }
 
 resource "aws_lambda_function" "resume_summarizer" {
-  function_name = "cloudresume-resume-summarizer"
+  function_name = local.summarizer_lambda_name
+  role          = aws_iam_role.resume_summarizer_role.arn
+  handler       = "resume_summarizer.lambda_handler"
+  runtime       = "python3.12"
 
   filename         = data.archive_file.resume_summarizer_zip.output_path
   source_code_hash = data.archive_file.resume_summarizer_zip.output_base64sha256
-
-  handler = "resume_summarizer.lambda_handler"
-  runtime = "python3.12"
-
-  role = aws_iam_role.resume_summarizer_role.arn
 
   timeout     = 30
   memory_size = 128
@@ -72,7 +70,7 @@ resource "aws_lambda_function" "resume_summarizer" {
     variables = {
       MODEL_ID       = "anthropic.claude-3-haiku-20240307-v1:0"
       BEDROCK_REGION = "ap-southeast-2"
-      ALLOWED_ORIGIN = "https://robertgparedes.com"
+      ALLOWED_ORIGIN = var.allowed_origin
     }
   }
 }
