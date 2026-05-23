@@ -5,6 +5,7 @@ bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-2")
 MODEL_ID = "au.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
 def lambda_handler(event, context):
+    print("EVENT:", json.dumps(event))
     method = event.get("requestContext", {}).get("http", {}).get("method")
     if method == "OPTIONS":
         return {
