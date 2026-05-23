@@ -36,7 +36,8 @@ def lambda_handler(event, context):
         resume_text = resume_text[:1500]
 
         prompt = (
-            "Summarize this resume in 3 bullet points for a tech recruiter. "
+            "Summarize this resume in exactly 3 bullet points. "
+            "No introduction or header, just the bullet points. "
             "Focus on role, skills, and measurable impact if present.\n\n"
             f"{resume_text}"
         )
@@ -52,7 +53,7 @@ def lambda_handler(event, context):
                 }
             ],
             inferenceConfig={
-                "maxTokens": 150,
+                "maxTokens": 300,
                 "temperature": 0.3,
                 #"topP": 0.9
             }
