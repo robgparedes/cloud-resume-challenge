@@ -847,7 +847,11 @@
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-        output.textContent = data.summary || "No summary returned.";
+        output.innerHTML = (data.summary || "No summary returned.")
+        .split("•")
+        .filter(s => s.trim())
+        .map(s => `<p>• ${s.trim()}</p>`)
+        .join("");
       } catch (err) {
         console.error("Summarizer error:", err);
         output.textContent = `Error: ${err.message}`;
