@@ -503,7 +503,7 @@
     <h2 class="section-title">Resume Summary</h2>
     <p class="summary-text" style="margin-bottom: 20px;">Want to see a TL;DR of my resume? Click the "Summarize" button below.</p>
     <div class="summarizer-box">
-      <textarea id="summarizer-input" class="summarizer-input" placeholder="Optional: add a specific focus (e.g. 'for a SaaS company' or 'highlight writing experience')"></textarea>
+      <!-- <textarea id="summarizer-input" class="summarizer-input" placeholder="Optional: add a specific focus (e.g. 'for a SaaS company' or 'highlight writing experience')"></textarea> -->
       <button id="summarize-btn" class="summarize-btn">Summarize</button>
     </div>
     <div id="summarizer-output" class="summarizer-output" style="display:none"></div>
@@ -818,23 +818,35 @@
       output.style.display = "block";
       output.textContent = "Generating summary...";
 
+      const resumeText = `
+        Robert Paredes — Senior Network Engineer & Copywriter
+
+        Senior Network Engineer with 10+ years of experience managing enterprise-scale network infrastructure across telco and corporate environments. Proven track record in network operations, multi-site support, data center networking, and infrastructure project delivery. Extensive hands-on experience with Cisco, Juniper, HP, and Meraki. AWS Certified Cloud Practitioner. Excellent communicator with strong analytical, documentation, and troubleshooting skills.
+
+        Experience:
+        - Freelance Content Writer, SafetyCulture (Feb 2022 – Present)
+        - Copywriter, Kittl (Feb 2024 – Aug 2024)
+        - Copywriter, Copygeeks (Aug 2021 – Sep 2023)
+        - Network Engineer, Verizon (Oct 2016 – Sep 2020)
+        - Network Specialist, Concentrix (Feb 2014 – Oct 2016)
+        - Network Systems Engineer, IBM Daksh (Sep 2013 – Feb 2014)
+        - Network Engineer, Regus (Feb 2013 – Sep 2013)
+        - Network Implementation Engineer, Accenture (Jun 2011 – Feb 2013)
+
+        Certifications: AWS Cloud Practitioner, CCNA, CCNP, CCNA Security, CCIP, JNCIS-ENT, JNCIA-Junos, Fortinet NSE 1 & 2, ITIL Foundation, Google SEO (x4)
+
+        Skills: Cloud Computing, Network Security, LAN/WAN/SD-WAN, Firewall Management, Copywriting, SEO, Whitepaper & Case Study Writing
+      `;
+
       try {
         const res = await fetch(SUMMARIZE_API, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            text: "Network engineer with 10 years of experience in AWS and Python."
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: resumeText })
         });
 
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || `HTTP ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
         output.textContent = data.summary || "No summary returned.";
       } catch (err) {
         console.error("Summarizer error:", err);
