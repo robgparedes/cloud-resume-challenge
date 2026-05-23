@@ -38,6 +38,7 @@ def lambda_handler(event, context):
         prompt = (
             "Summarize this resume in exactly 3 bullet points. "
             "No introduction or header, just the bullet points. "
+            "Do not mention any company names, employer names, or date ranges. "
             "Focus on role, skills, and measurable impact if present.\n\n"
             f"{resume_text}"
         )
